@@ -12,13 +12,15 @@
       height: 100vh;
       width: 100vw;
       overflow: hidden;
+      border: 5px solid black; /* Borda preta ao redor de tudo */
+      box-sizing: border-box;
     }
 
     #container {
       display: flex;
       flex-direction: row;
-      height: 100vh;
-      width: 100vw;
+      height: 100%;
+      width: 100%;
       box-sizing: border-box;
       padding: 16px;
       gap: 16px;
@@ -27,23 +29,37 @@
     .buttons {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center; /* Centraliza verticalmente */
       align-items: center;
       height: 100%;
       width: 80px;
+      gap: 20px;
     }
 
     .buttons button {
       writing-mode: vertical-rl;
-      transform: rotate(180deg);
+      transform: rotate(360deg);
       font-size: 16px;
       padding: 10px;
       width: 100%;
       height: 100px;
-      background-color: #ffeb3b;
-      border: 2px solid yellow;
+      border: none;
       border-radius: 8px;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
+    }
+
+    .btn-limpar {
+      background-color: #007bff;
+    }
+
+    .btn-cancelar {
+      background-color: #dc3545;
+    }
+
+    .btn-salvar {
+      background-color: #28a745;
     }
 
     #canvas-container {
@@ -65,9 +81,9 @@
 <body>
   <div id="container">
     <div class="buttons">
-      <button onclick="clearSignature()">Limpar</button>
-      <button onclick="saveSignature()">Salvar</button>
-      <button onclick="alert('Voltar')">Voltar</button>
+      <button class="btn-limpar" onclick="clearSignature()">Limpar</button>
+      <button class="btn-cancelar" onclick="cancelSignature()">Cancelar</button>
+      <button class="btn-salvar" onclick="saveSignature()">Salvar</button>
     </div>
     <div id="canvas-container">
       <canvas id="signature"></canvas>
@@ -124,6 +140,14 @@
 
     function clearSignature() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function cancelSignature() {
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onSignatureCancelled');
+      } else {
+        alert("Assinatura cancelada.");
+      }
     }
 
     function saveSignature() {
