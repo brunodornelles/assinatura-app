@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Assinatura</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #f0f0f0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    #container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      box-sizing: border-box;
+      padding: 16px;
+    }
+    #canvas-container {
+      flex-grow: 1;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      background-color: white;
+      border: 2px solid #ccc;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    .buttons {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-left: 16px;
+    }
+    button {
+      font-size: 18px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="canvas-container">
+      <canvas id="signature"></canvas>
+    </div>
+    <div class="buttons">
+      <button onclick="clearSignature()">Limpar</button>
+      <button onclick="saveSignature()">Salvar</button>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("signature");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      const container = document.getElementById("canvas-container");
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    let drawing = false;
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("touchstart", startDrawing, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
+    canvas.addEventListener("touchend", stopDrawing);
+
+    function getPos(e) {
+      if (e.touches) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }
+      return { x: e.clientX, y: e.clientY };
+    }
+
+    function startDrawing(e) {
+      e.preventDefault();
+      drawing = true;
+      const pos = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      e.preventDefault();
+      const pos = getPos(e);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    }
+
+    function stopDrawing(e) {
+      e.preventDefault();
+      drawing = false;
+    }
+
+    function clearSignature() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function saveSignature() {
+      const dataUrl = canvas.toDataURL("image/png");
+      if (window.flutter_inappwebview) {
+        window.flutter_inappwebview.callHandler('onSignatureSaved', dataUrl);
+      } else {
+        alert("Assinatura salva!");
+        console.log(dataUrl);
+      }
+    }
+  </script>
+</body>
+</html>
