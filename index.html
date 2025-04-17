@@ -1,71 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-height, height=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Assinatura Paisagem</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Assinatura</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      overflow: hidden;
-      background-color: #f0f0f0;
+      background-color: #fff;
       height: 100vh;
       width: 100vw;
+      overflow: hidden;
     }
 
-    #rotated-container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 100vh;
-      height: 100vw;
-      transform: rotate(90deg) translateY(-100vh);
-      transform-origin: center;
-      background-color: #f0f0f0;
+    #container {
       display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    canvas {
-      background-color: white;
-      border: 2px solid #ccc;
-      width: 100%;
-      height: calc(100% - 80px);
-      touch-action: none;
+      flex-direction: row;
+      height: 100vh;
+      width: 100vw;
+      box-sizing: border-box;
+      padding: 16px;
+      gap: 16px;
     }
 
     .buttons {
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      gap: 20px;
-      padding: 16px;
+      height: 100%;
+      width: 80px;
     }
 
-    button {
-      font-size: 18px;
-      padding: 10px 20px;
-      border: none;
+    .buttons button {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-size: 16px;
+      padding: 10px;
+      width: 100%;
+      height: 100px;
+      background-color: #ffeb3b;
+      border: 2px solid yellow;
       border-radius: 8px;
-      background-color: #007bff;
-      color: white;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    #canvas-container {
+      flex-grow: 1;
+      border: 2px solid blue;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    canvas {
+      background-color: white;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
     }
   </style>
 </head>
 <body>
-  <div id="rotated-container">
-    <canvas id="signature"></canvas>
+  <div id="container">
     <div class="buttons">
       <button onclick="clearSignature()">Limpar</button>
       <button onclick="saveSignature()">Salvar</button>
+      <button onclick="alert('Voltar')">Voltar</button>
+    </div>
+    <div id="canvas-container">
+      <canvas id="signature"></canvas>
     </div>
   </div>
 
@@ -74,8 +79,8 @@
     const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
-      canvas.width = window.innerHeight;
-      canvas.height = window.innerWidth - 80; // altura menos o espaço dos botões
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
     }
 
     resizeCanvas();
@@ -86,13 +91,13 @@
     function getPos(e) {
       if (e.touches) {
         return {
-          x: e.touches[0].clientY,
-          y: window.innerWidth - e.touches[0].clientX
+          x: e.touches[0].clientX - canvas.getBoundingClientRect().left,
+          y: e.touches[0].clientY - canvas.getBoundingClientRect().top
         };
       }
       return {
-        x: e.clientY,
-        y: window.innerWidth - e.clientX
+        x: e.clientX - canvas.getBoundingClientRect().left,
+        y: e.clientY - canvas.getBoundingClientRect().top
       };
     }
 
