@@ -1,51 +1,50 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>Assinatura</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-height, height=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Assinatura Paisagem</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      background-color: #f0f0f0;
-      height: 100%;
-      width: 100%;
       overflow: hidden;
-    }
-    #container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
+      background-color: #f0f0f0;
       height: 100vh;
       width: 100vw;
-      box-sizing: border-box;
-      padding: 16px;
     }
-    #canvas-container {
-      flex-grow: 1;
-      height: 100%;
+
+    #rotated-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100vh;
+      height: 100vw;
+      transform: rotate(90deg) translateY(-100vh);
+      transform-origin: center;
+      background-color: #f0f0f0;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
     }
+
     canvas {
       background-color: white;
       border: 2px solid #ccc;
       width: 100%;
-      height: 100%;
+      height: calc(100% - 80px);
       touch-action: none;
     }
+
     .buttons {
-      width: 200px;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       gap: 20px;
-      margin-left: 16px;
+      padding: 16px;
     }
+
     button {
       font-size: 18px;
       padding: 10px 20px;
@@ -54,18 +53,16 @@
       background-color: #007bff;
       color: white;
       cursor: pointer;
-      width: 100%;
     }
+
     button:hover {
       background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div id="container">
-    <div id="canvas-container">
-      <canvas id="signature"></canvas>
-    </div>
+  <div id="rotated-container">
+    <canvas id="signature"></canvas>
     <div class="buttons">
       <button onclick="clearSignature()">Limpar</button>
       <button onclick="saveSignature()">Salvar</button>
@@ -77,9 +74,8 @@
     const ctx = canvas.getContext("2d");
 
     function resizeCanvas() {
-      const container = document.getElementById("canvas-container");
-      canvas.width = container.clientWidth;
-      canvas.height = container.clientHeight;
+      canvas.width = window.innerHeight;
+      canvas.height = window.innerWidth - 80; // altura menos o espaço dos botões
     }
 
     resizeCanvas();
@@ -87,18 +83,17 @@
 
     let drawing = false;
 
-    canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", stopDrawing);
-    canvas.addEventListener("touchstart", startDrawing, { passive: false });
-    canvas.addEventListener("touchmove", draw, { passive: false });
-    canvas.addEventListener("touchend", stopDrawing);
-
     function getPos(e) {
       if (e.touches) {
-        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        return {
+          x: e.touches[0].clientY,
+          y: window.innerWidth - e.touches[0].clientX
+        };
       }
-      return { x: e.clientX, y: e.clientY };
+      return {
+        x: e.clientY,
+        y: window.innerWidth - e.clientX
+      };
     }
 
     function startDrawing(e) {
@@ -135,6 +130,13 @@
         console.log(dataUrl);
       }
     }
+
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("touchstart", startDrawing, { passive: false });
+    canvas.addEventListener("touchmove", draw, { passive: false });
+    canvas.addEventListener("touchend", stopDrawing);
   </script>
 </body>
 </html>
